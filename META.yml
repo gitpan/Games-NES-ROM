@@ -1,0 +1,20 @@
+---
+name: Games-NES-ROM
+version: 0.01
+author:
+  - 'Brian Cassidy <bricas@cpan.org>'
+abstract: View information about an NES game from a ROM file
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Class::Accessor: 0
+  Digest::CRC: 0
+provides:
+  Games::NES::ROM:
+    file: lib/Games/NES/ROM.pm
+    version: 0.01
+generated_by: Module::Build version 0.2801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
