@@ -6,7 +6,7 @@ Games::NES::ROM - View information about an NES game from a ROM file
 
 =head1 SYNOPSIS
 
-	use Games::NES::ROM;
+    use Games::NES::ROM;
     
     # Read in the ROM
     my $rom = Games::NES::ROM->new( 'file.nes' );
@@ -24,37 +24,37 @@ Games::NES::ROM - View information about an NES game from a ROM file
 This module loads the details of an NES rom file. An NES
 ROM file is layed out as follows:
 
-    +-----------+--------------+---------+---------+ Header
-    | NES\0x01a |[PC] [CC] X X | X X X X | X X X X | 16 Bytes
-    +-----------+--------------+---------+---------+
-    |                                              |
-    |         PRG Banks (PC * 16384 Bytes)         |
-    |                                              |
-    +----------------------------------------------+
-    |                                              |
-    |         CHR Banks (CC * 8192 Bytes)          |
-    |                                              |
-    +----------------------------------------------+
-    |                                              |
-    |         Title (128 Bytes - Optional)         |
-    |                                              |
-    +----------------------------------------------+
+    +-----------+---------------+---------+---------+ Header
+    | NES\0x01a | [PC] [CC] X X | X X X X | X X X X | 16 Bytes
+    +-----------+---------------+---------+---------+
+    |                                               |
+    |          PRG Banks (PC * 16384 Bytes)         |
+    |                                               |
+    +-----------------------------------------------+
+    |                                               |
+    |          CHR Banks (CC * 8192 Bytes)          |
+    |                                               |
+    +-----------------------------------------------+
+    |                                               |
+    |          Title (128 Bytes - Optional)         |
+    |                                               |
+    +-----------------------------------------------+
 
 =head1 INSTALLATION
 
 To install this module via Module::Build:
 
-	perl Build.PL
-	./Build         # or `perl Build`
-	./Build test    # or `perl Build test`
-	./Build install # or `perl Build install`
+    perl Build.PL
+    ./Build         # or `perl Build`
+    ./Build test    # or `perl Build test`
+    ./Build install # or `perl Build install`
 
 To install this module via ExtUtils::MakeMaker:
 
-	perl Makefile.PL
-	make
-	make test
-	make install
+    perl Makefile.PL
+    make
+    make test
+    make install
 
 =cut
 
@@ -72,7 +72,7 @@ use constant CHR_BANK_SIZE => 8192;
 use FileHandle;
 use Digest::CRC;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 my $header_template = 'A4 C*';
 my @header_fields   = qw( identifier PRG_count CHR_count mapper );
@@ -89,15 +89,15 @@ argument may be passed to immediately load the data.
 =cut
 
 sub new {
-	my $class = shift;
-	my $file  = shift;
-	my $self  = {};
+    my $class = shift;
+    my $file  = shift;
+    my $self  = {};
 
-	bless $self, $class;
+    bless $self, $class;
 
-	$self->load( $file ) if $file;
+    $self->load( $file ) if $file;
 
-	return $self;
+    return $self;
 }
 
 =head2 load( $file )
@@ -107,74 +107,112 @@ Reads the ROM structure into memory.
 =cut
 
 sub load {
-	my $self = shift;
-	my $file = shift;
+    my $self = shift;
+    my $file = shift;
 
     my $rom = FileHandle->new( $file, '<' );
-	binmode( $rom );
+    binmode( $rom );
 
-	my $header;
-	$rom->read( $header, HEADER_SIZE );
+    my $header;
+    $rom->read( $header, HEADER_SIZE );
 
-	die 'Not an NES rom' unless $header =~ /^NES/;
+    die 'Not an NES rom' unless $header =~ /^NES/;
 
-	my @values = unpack( $header_template, $header );
+    my @values = unpack( $header_template, $header );
 
-	for( 0..2 ) {
-		$self->set( $header_fields[ $_ ] => $values[ $_ ] );
-	}
+    for( 0..2 ) {
+        $self->set( $header_fields[ $_ ] => $values[ $_ ] );
+    }
 
-	$self->horizontal_mirroring( $values[ 3 ] & 1 ^ 1 );
-	$self->vertical_mirroring( $values[ 3 ] & 1 );
-	$self->SRAM( $values[ 3 ] & 2 );
-	$self->has_trainer( $values[ 3 ] & 4 );
-	$self->VRAM( $values[ 3 ] & 8 );
+    $self->horizontal_mirroring( $values[ 3 ] & 1 ^ 1 );
+    $self->vertical_mirroring( $values[ 3 ] & 1 );
+    $self->SRAM( $values[ 3 ] & 2 );
+    $self->has_trainer( $values[ 3 ] & 4 );
+    $self->VRAM( $values[ 3 ] & 8 );
 
-	my $prg_count = $self->PRG_count;
-	my $chr_count = $self->CHR_count;
+    my $prg_count = $self->PRG_count;
+    my $chr_count = $self->CHR_count;
 
-	my $mapper = ( $values[ 3 ] & 240 ) >> 4;
-	$mapper   |= ( $values[ 4 ] & 240 );
+    my $mapper = ( $values[ 3 ] & 240 ) >> 4;
+    $mapper   |= ( $values[ 4 ] & 240 );
 
-	if( $mapper != 0 and ( $prg_count == 2 or $prg_count == 1 ) and $chr_count == 1 ) {
-		$mapper = 0;
-	}
+    if( $mapper != 0 and ( $prg_count == 2 or $prg_count == 1 ) and $chr_count == 1 ) {
+        $mapper = 0;
+    }
 
-	$self->mapper( $mapper );
+    $self->mapper( $mapper );
 
     if( $self->has_trainer ) {
-    	my $trainer;
-	    $rom->read( $trainer, TRAINER_SIZE );
+        my $trainer;
+        $rom->read( $trainer, TRAINER_SIZE );
         $self->trainer( $trainer );
     }
 
-	my @prg_banks = map {
-		my $data;
-		$rom->read( $data, PRG_BANK_SIZE );
-		[ unpack( 'C*', $data ) ];
-	} 1..$prg_count;
+    my @prg_banks = map {
+        my $data;
+        $rom->read( $data, PRG_BANK_SIZE );
+        $data;
+    } 1..$prg_count;
 
-	my @chr_banks = map {
-		my $data;
-		$rom->read( $data, CHR_BANK_SIZE );
-		[ unpack( 'C*', $data ) ];
-	} 1..$chr_count;
+    my @chr_banks = map {
+        my $data;
+        $rom->read( $data, CHR_BANK_SIZE );
+        $data;
+    } 1..$chr_count;
 
-	$self->PRG_banks( \@prg_banks );
-	$self->CHR_banks( \@chr_banks );
+    $self->PRG_banks( \@prg_banks );
+    $self->CHR_banks( \@chr_banks );
 
     my $title;
     if($rom->read( $title, TITLE_SIZE ) == 128 ) {
         $self->title( $title );
     }
 
-	$rom->seek( HEADER_SIZE, 0 );
+    $rom->seek( HEADER_SIZE, 0 );
 
-	my $ctx = Digest::CRC->new( type=> 'crc32' );
-	$ctx->addfile( $rom );
-	$self->CRC( $ctx->hexdigest );
+    my $ctx = Digest::CRC->new( type=> 'crc32' );
+    $ctx->addfile( $rom );
+    $self->CRC( $ctx->hexdigest );
 
-	$rom->close;
+    $rom->close;
+}
+
+=head2 sprite( $chr_bank, $index )
+
+Returns the raw (composite) sprite in the specified 
+CHR bank at the specified array index.
+
+=cut
+
+sub sprite {
+    my $self   = shift;
+    my $chr    = shift;
+    my $offset = shift;
+
+    die 'invalud CHR bank' if $chr > $self->CHR_count - 1 or $chr < 0;
+    die 'invalud sprite index' if $offset > 512 or $offset < 0;
+    
+    my $bank      = $self->CHR_banks->[ $chr ];
+    my $start     = 16 * $offset;
+    my @channel_a = unpack( 'C*', substr( $bank, $start, 8 ) );
+    my @channel_b = unpack( 'C*', substr( $bank, $start + 8, 8 ) );
+
+    my $composite = '';
+
+    for my $i ( 0..7 ) {
+        for my $j ( reverse 0..7 ) {
+            $composite .= pack( 'C', $self->_combine_bits( $channel_a[ $i ], $channel_b[ $i ], $j ) );
+        }
+    }
+    
+    return $composite;
+}
+
+sub _combine_bits {
+    my $self = shift;
+    my( $chan_a, $chan_b, $offset ) = @_;
+
+    return ( ( $chan_a >> $offset ) & 1 ) | ( ( ( $chan_b >> $offset ) & 1 ) << 1 );
 }
 
 =head1 ACCESSORS
