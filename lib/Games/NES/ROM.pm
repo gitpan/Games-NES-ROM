@@ -72,7 +72,7 @@ use constant CHR_BANK_SIZE => 8192;
 use FileHandle;
 use Digest::CRC;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 my $header_template = 'A4 C*';
 my @header_fields   = qw( identifier PRG_count CHR_count mapper );
@@ -189,8 +189,8 @@ sub sprite {
     my $chr    = shift;
     my $offset = shift;
 
-    die 'invalud CHR bank' if $chr > $self->CHR_count - 1 or $chr < 0;
-    die 'invalud sprite index' if $offset > 512 or $offset < 0;
+    die 'invalid CHR bank' if $chr > $self->CHR_count - 1 or $chr < 0;
+    die 'invalid sprite index' if $offset > 512 or $offset < 0;
     
     my $bank      = $self->CHR_banks->[ $chr ];
     my $start     = 16 * $offset;
