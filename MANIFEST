@@ -1,8 +1,10 @@
 Build.PL
 Changes
 lib/Games/NES/ROM.pm
-MANIFEST
+Makefile.PL
+MANIFEST			This list of files
 META.yml
+README
 t/01-use.t
 t/02-rom.t
 t/03-sprite.t
@@ -10,6 +12,3 @@ t/98-pod_coverage.t
 t/99-pod.t
 t/roms/notarom.nes
 t/roms/test.nes
-
-Makefile.PL
-README

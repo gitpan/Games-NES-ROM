@@ -72,7 +72,7 @@ use constant CHR_BANK_SIZE => 8192;
 use FileHandle;
 use Digest::CRC;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 my $header_template = 'A4 C*';
 my @header_fields   = qw( identifier PRG_count CHR_count mapper );
@@ -269,7 +269,7 @@ The following accessors are available:
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2006 by Brian Cassidy
+Copyright 2007 by Brian Cassidy
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 

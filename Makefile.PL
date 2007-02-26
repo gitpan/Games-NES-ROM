@@ -8,6 +8,7 @@ WriteMakefile
           'EXE_FILES' => [],
           'VERSION_FROM' => 'lib/Games/NES/ROM.pm',
           'PREREQ_PM' => {
+                           'Test::More' => 0,
                            'Class::Accessor' => 0,
                            'Digest::CRC' => 0
                          }
