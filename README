@@ -36,15 +36,6 @@ DESCRIPTION
         +-----------------------------------------------+
 
 INSTALLATION
-    To install this module via Module::Build:
-
-        perl Build.PL
-        ./Build         # or `perl Build`
-        ./Build test    # or `perl Build test`
-        ./Build install # or `perl Build install`
-
-    To install this module via ExtUtils::MakeMaker:
-
         perl Makefile.PL
         make
         make test
@@ -84,7 +75,7 @@ SEE ALSO
     * http://www.sadistech.com/nesromtool/romdoc.html
 
 AUTHOR
-    * Brian Cassidy <bricas@cpan.org>
+    Brian Cassidy <bricas@cpan.org>
 
 COPYRIGHT AND LICENSE
     Copyright 2007 by Brian Cassidy
